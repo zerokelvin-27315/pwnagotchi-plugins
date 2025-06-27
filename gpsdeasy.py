@@ -104,11 +104,22 @@ class GPSD:
         if 'class' in data:
             if data['class'] == 'POLL':
                 # if poll is one of these give it
-                if 'tpv' in data and poll == 'tpv':
-                    return data['tpv'][0]
-                elif 'sky' in data and poll == 'sky':
-                    return data['sky'][0]
-                else: return None # else return None
+                try:
+                    if 'tpv' in data and poll == 'tpv':
+                        if isinstance(data['tpv'], list) and len(data['tpv']) > 0:
+                            return data['tpv'][0]
+                        else:
+                            return None
+                    elif 'sky' in data and poll == 'sky':
+                        if isinstance(data['sky'], list) and len(data['sky']) > 0:
+                            return data['sky'][0]
+                        else:
+                            return None
+                    else:
+                        return None  # else return None
+                except Exception as e:
+                    logging.warning(f"[gpsdeasy] Error accessing GPSD data: {e}")
+                    return None
 
             elif data['class'] == 'DEVICES':
                 return None
